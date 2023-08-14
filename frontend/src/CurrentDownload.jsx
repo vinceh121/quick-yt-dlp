@@ -1,7 +1,7 @@
 import "./currentdownload.css";
 import { Loader } from "./Loader";
 import { liveDownload } from "./api";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "react";
 
 function DownloadEntry({ state }) {
 	return (
