@@ -1,4 +1,5 @@
 import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
 const strings = {
 	en: {
@@ -6,6 +7,7 @@ const strings = {
 			startDownload: "Start download",
 			urlLabel: "Video/Audio URL",
 			audioOnlyLabel: "Audio only",
+			totalProgress: "Downloading {{index}} / {{count}}..."
 		},
 	},
 	fr: {
@@ -13,10 +15,11 @@ const strings = {
 			startDownload: "Démarrer téléchargement",
 			urlLabel: "URL de Vidéo/Audio",
 			audioOnlyLabel: "Audio seulement",
+			totalProgress: "Téléchargement de {{index}} / {{count}}..."
 		},
 	},
 };
 
-i18next.init({ fallbackLng: "en", resources: strings });
+i18next.use(LanguageDetector).init({ fallbackLng: "en", resources: strings });
 
 export default i18next;
