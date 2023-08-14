@@ -8,17 +8,15 @@ export function App() {
 	return (
 		<>
 			<AppBar position="static">
-				<Container>
-					<Toolbar>
-						<Typography variant="h6" noWrap component="a" href="/" sx={{
-							mr: 2,
-							display: { xs: 'none', md: 'flex' },
-							fontFamily: 'monospace',
-							color: 'inherit',
-							textDecoration: 'none',
-						}}>Quick yt-dlp</Typography>
-					</Toolbar>
-				</Container>
+				<Toolbar>
+					<Typography variant="h6" noWrap component="a" href="/" sx={{
+						mr: 2,
+						display: { xs: 'none', md: 'flex' },
+						fontFamily: 'monospace',
+						color: 'inherit',
+						textDecoration: 'none',
+					}}>Quick yt-dlp</Typography>
+				</Toolbar>
 			</AppBar>
 			<main>
 				<Route path="/" component={StartDownload} />

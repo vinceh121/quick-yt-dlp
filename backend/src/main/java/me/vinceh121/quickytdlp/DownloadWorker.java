@@ -2,12 +2,17 @@ package me.vinceh121.quickytdlp;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -33,9 +38,9 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 
 	@Override
 	public void handle(final Promise<Void> p) {
-		final String[] cmd = {
+		final String[] cmd = Arrays.stream(new String[] {
 				this.main.getConfig().getYtDlpPath(),
-				this.audioOnly ? "-x" : "",
+				this.audioOnly ? "-x" : null,
 				"--restrict-filenames",
 				"--embed-metadata",
 				"--newline",
@@ -44,7 +49,7 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 						"%(progress.downloaded_bytes)s", "%(progress.total_bytes)s", "%(progress.eta)s",
 						"%(progress.speed)s", "%(info.playlist_index)s", "%(info.playlist_count)s",
 						"%(progress.status)s"),
-				this.url.toString() };
+				this.url.toString() }).filter(s -> s != null).toArray(l -> new String[l]);
 
 		Path folderPath = this.main.getConfig().getDownloadFolder().resolve(this.id.toString());
 		File folder = folderPath.toFile();
@@ -79,13 +84,41 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 			return;
 		}
 
-		this.eventPublisher.write(new FinishedEvent(this.id));
+		final File[] list = folder.listFiles();
+
+		final String downloadPath;
+
+		if (list.length == 1) {
+			downloadPath = this.main.getConfig().getDownloadBasePath() + "/" + this.id + "/" + list[0].getName();
+		} else if (list.length > 1) {
+			Path zipPath = this.main.getConfig().getDownloadFolder().resolve(this.id + ".zip");
+
+			try (final ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zipPath))) {
+				zipOut.setLevel(9);
+
+				for (File f : list) {
+					ZipEntry entry = new ZipEntry(f.getName());
+					zipOut.putNextEntry(entry);
+					try (FileInputStream in = new FileInputStream(f)) {
+						in.transferTo(zipOut);
+					}
+				}
+			} catch (IOException e) {
+				p.fail(e);
+				return;
+			}
+
+			downloadPath = this.main.getConfig().getDownloadBasePath() + "/" + this.id + ".zip";
+		} else {
+			throw new IllegalStateException();
+		}
+
+		this.eventPublisher.write(new FinishedEvent(this.id, downloadPath));
 
 		p.complete();
 	}
 
 	private void handleProgress(final String line) {
-		System.out.println(line);
 		if (!line.startsWith(PROGRESS_MAGIC)) {
 			return;
 		}

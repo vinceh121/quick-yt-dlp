@@ -2,7 +2,9 @@ import { Loader } from "./Loader";
 import { liveDownload } from "./api";
 import i18n from "./i18n";
 import { useEffect, useState } from "react";
-import { Box, Card, CardContent, CardMedia, LinearProgress, Paper, Slide, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, LinearProgress, Paper, Slide, Stack, Typography } from "@mui/material";
+import { Download } from "@mui/icons-material";
+import { DownloadDone } from "@mui/icons-material";
 
 function DownloadEntry({ state }) {
 	return (
@@ -46,21 +48,23 @@ const stateSort = (a, b) => {
 export function CurrentDownload({ params: { downloadId } }) {
 	const [state, setState] = useState({});
 	const [lastEvent, setLastEvent] = useState(undefined);
+	const [downloadPath, setDownloadPath] = useState(undefined);
 
 	useEffect(() => {
 		liveDownload(downloadId).then(ws => {
 			ws.onmessage = ({ data }) => {
 				data = JSON.parse(data);
+				console.log(data);
 
 				if (data.eventType === "PROGRESS") {
 					setState(prev => Object.assign({}, prev, { [data.videoId]: data }));
 					setLastEvent(data);
+				} else if (data.eventType === "FINISHED") {
+					setDownloadPath(data.downloadPath);
 				}
 			};
 		});
 	}, [downloadId]);
-
-	console.log(state);
 
 	return <>
 		<Stack spacing={2}>
@@ -68,8 +72,15 @@ export function CurrentDownload({ params: { downloadId } }) {
 				Object.keys(state).length === 0
 					? <Loader />
 					: <Paper sx={{ padding: "1rem" }}>
-						<LinearProgress color="secondary" variant="determinate" value={lastEvent.playlistIndex / lastEvent.playlistCount * 100} />
-						<Typography variant="body1">{i18n.t("totalProgress", { index: lastEvent.playlistIndex, count: lastEvent.playlistCount })}</Typography>
+						{!downloadPath ? <>
+							<LinearProgress color="secondary" variant="determinate" value={lastEvent.playlistIndex / lastEvent.playlistCount * 100} />
+							<Typography variant="body1">{i18n.t("totalProgress", { index: lastEvent.playlistIndex, count: lastEvent.playlistCount })}</Typography>
+						</>
+							: <>
+								<Typography variant="h3"><DownloadDone color="success" fontSize="large" />{i18n.t("downloadFinishedTitle")}</Typography>
+								<Button variant="contained" component="a" target="_blank" href={downloadPath} startIcon={<Download />}>{i18n.t("downloadButton")}</Button>
+							</>
+						}
 					</Paper>
 			}
 

@@ -7,7 +7,7 @@ import java.util.UUID;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import me.vinceh121.quickytdlp.event.ProgressEvent;
+import me.vinceh121.quickytdlp.event.IEvent;
 
 public class Routes {
 	private final QuickYtDlp main;
@@ -51,9 +51,9 @@ public class Routes {
 		ctx.request().toWebSocket().onSuccess(ws -> {
 			this.main.getVertx()
 					.eventBus()
-					.<ProgressEvent>consumer(DownloadWorker.EVENT_BUS_PREFIX + downloadId)
+					.<IEvent>consumer(DownloadWorker.EVENT_BUS_PREFIX + downloadId)
 					.handler(msg -> {
-						final ProgressEvent evt = msg.body();
+						final IEvent evt = msg.body();
 						ws.writeTextMessage(JsonObject.mapFrom(evt).encode());
 					});
 		}).onFailure(ctx::fail);

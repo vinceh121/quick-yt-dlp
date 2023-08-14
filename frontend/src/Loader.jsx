@@ -1,5 +1,5 @@
 import "./loader.css";
 
 export function Loader() {
-	return <span class="loader"></span>;
+	return <span className="loader"></span>;
 }

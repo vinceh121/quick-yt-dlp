@@ -3,7 +3,7 @@ package me.vinceh121.quickytdlp;
 import java.nio.file.Path;
 
 public class Config {
-	private String listenAddress, ytDlpPath;
+	private String listenAddress, ytDlpPath, downloadBasePath;
 	private int port, workerInstances;
 	private Path downloadFolder = Path.of("/tmp/quick-yt-dlp");
 
@@ -21,6 +21,14 @@ public class Config {
 
 	public void setYtDlpPath(String ytDlpPath) {
 		this.ytDlpPath = ytDlpPath;
+	}
+
+	public String getDownloadBasePath() {
+		return downloadBasePath;
+	}
+
+	public void setDownloadBasePath(String downloadBasePath) {
+		this.downloadBasePath = downloadBasePath;
 	}
 
 	public int getPort() {
