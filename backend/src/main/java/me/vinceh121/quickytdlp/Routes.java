@@ -4,12 +4,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import me.vinceh121.quickytdlp.event.IEvent;
 
 public class Routes {
+	private static final Logger LOG = LogManager.getLogger(Routes.class);
 	private final QuickYtDlp main;
 
 	public Routes(QuickYtDlp main) {
@@ -38,6 +42,9 @@ public class Routes {
 		final DownloadWorker worker = new DownloadWorker(this.main);
 		worker.setUrl(url);
 		worker.setAudioOnly(audioOnly);
+
+		LOG.info("{} started download of {} as job {}", ctx.request().getHeader("X-Forwarded-For"), url,
+				worker.getId());
 
 		this.main.getWorkers().put(worker.getId(), worker);
 		this.main.getWorkerPool().executeBlocking(worker, false).onFailure(Throwable::printStackTrace);
