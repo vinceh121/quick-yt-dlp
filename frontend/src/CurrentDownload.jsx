@@ -1,5 +1,5 @@
 import { Loader } from "./Loader";
-import { liveDownload } from "./api";
+import { fetchDownloadJob, liveDownload } from "./api";
 import i18n from "./i18n";
 import { useEffect, useState } from "react";
 import { Alert, Box, Button, ButtonGroup, Card, CardActions, CardContent, CardMedia, Container, Grid, IconButton, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
@@ -78,7 +78,7 @@ const stateSort = (a, b) => {
 	return a.playlistIndex - b.playlistIndex;
 }
 
-export function CurrentDownload({ params: { downloadId } }) {
+export function CurrentDownload(params) {
 	const [state, setState] = useState({});
 	const [lastEvent, setLastEvent] = useState(undefined);
 	const [downloadPath, setDownloadPath] = useState(undefined);
@@ -89,10 +89,9 @@ export function CurrentDownload({ params: { downloadId } }) {
 	};
 
 	useEffect(() => {
-		liveDownload(downloadId).then(ws => {
+		liveDownload(params.params.downloadId).then(ws => {
 			ws.onmessage = ({ data }) => {
 				data = JSON.parse(data);
-				console.log(data);
 
 				if (data.eventType === "PROGRESS") {
 					setState(prev => Object.assign({}, prev, { [data.videoId]: data }));
@@ -105,7 +104,15 @@ export function CurrentDownload({ params: { downloadId } }) {
 			ws.onerror = setError;
 			ws.onclose = setError;
 		});
-	}, [downloadId]);
+
+		fetchDownloadJob(params.params.downloadId).then(res => {
+			setState(res.state);
+
+			if (res.downloadPath) {
+				setDownloadPath(res.downloadPath);
+			}
+		}, setError);
+	}, [params.params.downloadId]);
 
 	return <>
 		<Stack spacing={2}>

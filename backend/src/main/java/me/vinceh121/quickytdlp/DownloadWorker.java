@@ -135,6 +135,7 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		this.eventPublisher.write(new FinishedEvent(this.id, downloadPath));
 
 		this.main.getVertx().setTimer(this.main.getConfig().getDownloadTTL() * 1000, t -> {
+			this.main.getWorkers().remove(this.id);
 			try {
 				recurseDelete(folderPath);
 				if (zipPath != null) {
@@ -201,8 +202,12 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		this.downloadPath = downloadPath;
 	}
 
+	public Map<String, ProgressEvent> getState() {
+		return this.state;
+	}
+
 	public UUID getId() {
-		return id;
+		return this.id;
 	}
 
 	public static void recurseDelete(Path file) throws IOException {

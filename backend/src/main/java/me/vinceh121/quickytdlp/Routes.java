@@ -23,6 +23,7 @@ public class Routes {
 				.post("/download")
 				.handler(BodyHandler.create(false))
 				.handler(this::handleDownloadStart);
+		this.main.getApiRouter().get("/download/:downloadId").handler(this::handleGetJob);
 		this.main.getApiRouter().get("/download/:downloadId/live").handler(this::handleDownloadLive);
 	}
 
@@ -50,6 +51,25 @@ public class Routes {
 		this.main.getWorkerPool().executeBlocking(worker, false).onFailure(Throwable::printStackTrace);
 
 		ctx.json(new JsonObject().put("downloadId", worker.getId()));
+	}
+
+	private void handleGetJob(final RoutingContext ctx) {
+		final UUID downloadId = UUID.fromString(ctx.pathParam("downloadId"));
+
+		final DownloadWorker worker = this.main.getWorkers().get(downloadId);
+
+		final JsonObject res = new JsonObject();
+
+		res.put("state", worker.getState());
+
+		if (worker.getDownloadPath() == null) { // download is in progress
+			ctx.response().setStatusCode(206);
+		} else { // download is finished
+			ctx.response().setStatusCode(200);
+			res.put("downloadPath", worker.getDownloadPath());
+		}
+
+		ctx.json(res);
 	}
 
 	private void handleDownloadLive(final RoutingContext ctx) {
