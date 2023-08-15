@@ -2,7 +2,7 @@ import { Loader } from "./Loader";
 import { liveDownload } from "./api";
 import i18n from "./i18n";
 import { useEffect, useState } from "react";
-import { Alert, Box, Button, Card, CardContent, CardMedia, Container, Grid, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, ButtonGroup, Card, CardActions, CardContent, CardMedia, Container, Grid, IconButton, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import { DownloadDone } from "@mui/icons-material";
 import { Downloading } from "@mui/icons-material";
@@ -29,12 +29,14 @@ function DownloadEntry({ state }) {
 					</Box>
 					<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 						<CardContent>
-							<Typography variant="h4" gutterBottom>
-								{state.videoTitle}&nbsp;{
-									state.playlistIndex !== -1
-										? <Typography component="span" variant="caption">#{state.playlistIndex}</Typography>
-										: undefined}
-							</Typography>
+							<Box sx={{ display: "flex", flexDirection: "row", }}>
+								<Typography variant="h4" gutterBottom>
+									{state.videoTitle}&nbsp;{
+										state.playlistIndex !== -1
+											? <Typography component="span" variant="caption">#{state.playlistIndex}</Typography>
+											: undefined}
+								</Typography>
+							</Box>
 							<Grid container spacing={1}>
 								<Grid item>
 									<Downloading />
@@ -52,6 +54,13 @@ function DownloadEntry({ state }) {
 								</Grid>
 							</Grid>
 						</CardContent>
+						<CardActions>
+							{state.downloadPath && state.status === "finished" ?
+								<IconButton size="small" color="primary" variant="contained" target="_blank" href={state.downloadPath}>
+									<Download />
+								</IconButton>
+								: undefined}
+						</CardActions>
 					</Box>
 				</Box>
 			</Card >
@@ -114,7 +123,7 @@ export function CurrentDownload({ params: { downloadId } }) {
 								</>
 							: <>
 								<Typography variant="h3"><DownloadDone color="success" fontSize="large" />{i18n.t("downloadFinishedTitle")}</Typography>
-								<Button variant="contained" component="a" target="_blank" href={downloadPath} startIcon={<Download />}>{i18n.t("downloadButton")}</Button>
+								<Button size="large" variant="contained" component="a" target="_blank" href={downloadPath} startIcon={<Download />}>{i18n.t("downloadButton")}</Button>
 							</>
 						}
 					</Paper>

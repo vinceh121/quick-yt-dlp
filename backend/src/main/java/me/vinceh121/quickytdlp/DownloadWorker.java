@@ -55,7 +55,7 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 				PROGRESS_MAGIC + String.join(PROGRESS_SEPARATOR, "%(info.id)s", "%(info.title)s", "%(info.thumbnail)s",
 						"%(progress.downloaded_bytes)s", "%(progress.total_bytes)s", "%(progress.eta)s",
 						"%(progress.speed)s", "%(info.playlist_index)s", "%(info.playlist_count)s",
-						"%(progress.status)s"),
+						"%(progress.status)s", "%(info.filename)s"),
 				this.url.toString() }).filter(s -> s != null).toArray(l -> new String[l]);
 
 		Path folderPath = this.main.getConfig().getDownloadFolder().resolve(this.id.toString());
@@ -158,9 +158,12 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		final int playlistIndex = "NA".equals(parts[7]) ? -1 : Integer.parseInt(parts[7]);
 		final int playlistCount = "NA".equals(parts[8]) ? -1 : Integer.parseInt(parts[8]);
 		final String status = parts[9];
+		final String filename = parts[10];
+		
+		final String downloadPath = this.main.getConfig().getDownloadBasePath() + "/" + this.id + "/" + filename;
 
 		final ProgressEvent event = new ProgressEvent(this.id, videoId, videoTitle, videoThumbnail, downloadedBytes,
-				totalBytes, eta, speed, playlistIndex, playlistCount, status);
+				totalBytes, eta, speed, playlistIndex, playlistCount, status, downloadPath);
 
 		this.state.put(videoId, event);
 		this.eventPublisher.write(event);

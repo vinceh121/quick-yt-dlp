@@ -5,14 +5,14 @@ import java.util.UUID;
 public class ProgressEvent implements IEvent {
 	private static final long serialVersionUID = -330167806283720593L;
 	private final UUID downloadId;
-	private final String videoId, videoTitle, videoThumbnail, status;
+	private final String videoId, videoTitle, videoThumbnail, status, downloadPath;
 	private final long downloadedBytes, totalBytes;
 	private final float eta, speed;
 	private final int playlistIndex, playlistCount;
 
 	public ProgressEvent(UUID downloadId, String videoId, String videoTitle, String videoThumbnail,
 			long downloadedBytes, long totalBytes, float eta, float speed, int playlistIndex, int playlistCount,
-			String status) {
+			String status, String downloadPath) {
 		this.downloadId = downloadId;
 		this.videoId = videoId;
 		this.videoTitle = videoTitle;
@@ -24,6 +24,7 @@ public class ProgressEvent implements IEvent {
 		this.playlistIndex = playlistIndex;
 		this.playlistCount = playlistCount;
 		this.status = status;
+		this.downloadPath = downloadPath;
 	}
 
 	@Override
@@ -74,6 +75,10 @@ public class ProgressEvent implements IEvent {
 
 	public String getStatus() {
 		return status;
+	}
+
+	public String getDownloadPath() {
+		return downloadPath;
 	}
 
 	public float getProgress() {
