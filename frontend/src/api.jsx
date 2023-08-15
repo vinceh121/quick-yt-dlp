@@ -12,8 +12,14 @@ export const startDownload = async (url, audioOnly) => {
 };
 
 export const liveDownload = async (downloadId) => {
+	let proto;
+	switch (window.location.protocol) {
+		case "http:": proto = "ws://"; break;
+		case "https:": proto = "wss://"; break;
+	}
+
 	const ws = new WebSocket(
-		"ws://" + window.location.host + "/api/v1/download/" + downloadId + "/live"
+		proto + window.location.host + "/api/v1/download/" + downloadId + "/live"
 	);
 	return ws;
 };
