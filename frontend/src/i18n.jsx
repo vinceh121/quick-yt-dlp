@@ -8,7 +8,8 @@ const strings = {
 			urlLabel: "Video/Audio URL",
 			audioOnlyLabel: "Audio only",
 			totalProgress: "Downloading {{index}} / {{count}}...",
-			downloadButton: "Download"
+			downloadButton: "Download",
+			downloadFinishedTitle: "Download finished!"
 		},
 	},
 	fr: {
@@ -17,7 +18,8 @@ const strings = {
 			urlLabel: "URL de Vidéo/Audio",
 			audioOnlyLabel: "Audio seulement",
 			totalProgress: "Téléchargement de {{index}} / {{count}}...",
-			downloadButton: "Télécharger"
+			downloadButton: "Télécharger",
+			downloadFinishedTitle: "Téléchargement terminé !"
 		},
 	},
 };
