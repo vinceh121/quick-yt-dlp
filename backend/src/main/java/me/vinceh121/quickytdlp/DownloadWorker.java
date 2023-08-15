@@ -19,6 +19,10 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.FormattedMessage;
+
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.MessageProducer;
@@ -27,6 +31,7 @@ import me.vinceh121.quickytdlp.event.IEvent;
 import me.vinceh121.quickytdlp.event.ProgressEvent;
 
 public class DownloadWorker implements Handler<Promise<Void>> {
+	private static final Logger LOG = LogManager.getLogger(DownloadWorker.class);
 	public static final String PROGRESS_MAGIC = "PROG:", PROGRESS_SEPARATOR = "----quick-yt-dlp-split",
 			EVENT_BUS_PREFIX = "me.vinceh121.quickytdlp.";
 	private final QuickYtDlp main;
@@ -84,9 +89,11 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		if (exitValue != 0) {
 			p.fail("yt-dlp exited with " + exitValue);
 			try {
-				System.err.println(new String(proc.getErrorStream().readAllBytes()));
+				LOG.error("yt-dlp exited with code {} for job {}. Stderr: {}", exitValue, this.id,
+						new String(proc.getErrorStream().readAllBytes()));
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOG.error(new FormattedMessage("yt-dlp exited with code {} for job {}. Couldn't read stderr.", this.id,
+						exitValue), e);
 			}
 			return;
 		}
@@ -114,6 +121,7 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 					}
 				}
 			} catch (IOException e) {
+				LOG.error(new FormattedMessage("Failed to create ZIP for job {}", this.id), e);
 				p.fail(e);
 				return;
 			}
@@ -159,7 +167,7 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		final int playlistCount = "NA".equals(parts[8]) ? -1 : Integer.parseInt(parts[8]);
 		final String status = parts[9];
 		final String filename = parts[10];
-		
+
 		final String downloadPath = this.main.getConfig().getDownloadBasePath() + "/" + this.id + "/" + filename;
 
 		final ProgressEvent event = new ProgressEvent(this.id, videoId, videoTitle, videoThumbnail, downloadedBytes,
