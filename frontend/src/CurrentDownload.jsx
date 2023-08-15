@@ -2,9 +2,12 @@ import { Loader } from "./Loader";
 import { liveDownload } from "./api";
 import i18n from "./i18n";
 import { useEffect, useState } from "react";
-import { Alert, Box, Button, Card, CardContent, CardMedia, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardMedia, Container, Grid, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import { DownloadDone } from "@mui/icons-material";
+import { Downloading } from "@mui/icons-material";
+import { Speed } from "@mui/icons-material";
+import numeral from "numeral";
 
 function DownloadEntry({ state }) {
 	return (
@@ -32,11 +35,27 @@ function DownloadEntry({ state }) {
 										? <Typography component="span" variant="caption">#{state.playlistIndex}</Typography>
 										: undefined}
 							</Typography>
+							<Grid container spacing={1}>
+								<Grid item>
+									<Downloading />
+								</Grid>
+								<Grid item>
+									<Typography variant="caption">{numeral(state.downloadedBytes).format("0.00ib")} / {numeral(state.totalBytes).format("0.00ib")}</Typography>
+								</Grid>
+							</Grid>
+							<Grid container spacing={1}>
+								<Grid item>
+									<Speed />
+								</Grid>
+								<Grid item>
+									<Typography variant="caption">{numeral(state.speed).format("0.00ib")}/s</Typography>
+								</Grid>
+							</Grid>
 						</CardContent>
 					</Box>
 				</Box>
-			</Card>
-		</Slide>
+			</Card >
+		</Slide >
 	);
 }
 
