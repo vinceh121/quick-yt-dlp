@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 public class Config {
 	private String listenAddress, ytDlpPath, downloadBasePath;
-	private int port, workerInstances;
+	private int port, workerInstances, downloadTTL;
 	private Path downloadFolder = Path.of("/tmp/quick-yt-dlp");
 
 	public String getListenAddress() {
@@ -45,6 +45,20 @@ public class Config {
 
 	public void setWorkerInstances(int workerInstances) {
 		this.workerInstances = workerInstances;
+	}
+
+	/**
+	 * @return time until a download gets deleted, in seconds
+	 */
+	public int getDownloadTTL() {
+		return this.downloadTTL;
+	}
+
+	/**
+	 * @param downloadTTL time until a download gets deleted, in seconds
+	 */
+	public void setDownloadTTL(int downloadTTL) {
+		this.downloadTTL = downloadTTL;
 	}
 
 	public Path getDownloadFolder() {

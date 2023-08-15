@@ -6,8 +6,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,10 +95,13 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 
 		final String downloadPath;
 
+		final Path zipPath;
+
 		if (list.length == 1) {
+			zipPath = null;
 			downloadPath = this.main.getConfig().getDownloadBasePath() + "/" + this.id + "/" + list[0].getName();
 		} else if (list.length > 1) {
-			Path zipPath = this.main.getConfig().getDownloadFolder().resolve(this.id + ".zip");
+			zipPath = this.main.getConfig().getDownloadFolder().resolve(this.id + ".zip");
 
 			try (final ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zipPath))) {
 				zipOut.setLevel(9);
@@ -119,6 +125,17 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 
 		this.downloadPath = downloadPath;
 		this.eventPublisher.write(new FinishedEvent(this.id, downloadPath));
+
+		this.main.getVertx().setTimer(this.main.getConfig().getDownloadTTL() * 1000, t -> {
+			try {
+				recurseDelete(folderPath);
+				if (zipPath != null) {
+					Files.deleteIfExists(zipPath);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 
 		p.complete();
 	}
@@ -175,5 +192,21 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 
 	public UUID getId() {
 		return id;
+	}
+
+	public static void recurseDelete(Path file) throws IOException {
+		Files.walkFileTree(file, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+				return super.visitFile(file, attrs);
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+				Files.delete(dir);
+				return super.postVisitDirectory(dir, exc);
+			}
+		});
 	}
 }
