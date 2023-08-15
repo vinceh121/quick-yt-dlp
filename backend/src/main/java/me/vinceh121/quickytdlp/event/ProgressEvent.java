@@ -7,11 +7,11 @@ public class ProgressEvent implements IEvent {
 	private final UUID downloadId;
 	private final String videoId, videoTitle, videoThumbnail, status;
 	private final long downloadedBytes, totalBytes;
-	private final float progress, speed;
+	private final float eta, speed;
 	private final int playlistIndex, playlistCount;
 
 	public ProgressEvent(UUID downloadId, String videoId, String videoTitle, String videoThumbnail,
-			long downloadedBytes, long totalBytes, float progress, float speed, int playlistIndex, int playlistCount,
+			long downloadedBytes, long totalBytes, float eta, float speed, int playlistIndex, int playlistCount,
 			String status) {
 		this.downloadId = downloadId;
 		this.videoId = videoId;
@@ -19,7 +19,7 @@ public class ProgressEvent implements IEvent {
 		this.videoThumbnail = videoThumbnail;
 		this.downloadedBytes = downloadedBytes;
 		this.totalBytes = totalBytes;
-		this.progress = progress;
+		this.eta = eta;
 		this.speed = speed;
 		this.playlistIndex = playlistIndex;
 		this.playlistCount = playlistCount;
@@ -56,8 +56,8 @@ public class ProgressEvent implements IEvent {
 		return totalBytes;
 	}
 
-	public float getProgress() {
-		return progress;
+	public float getEta() {
+		return eta;
 	}
 
 	public float getSpeed() {
@@ -76,6 +76,10 @@ public class ProgressEvent implements IEvent {
 		return status;
 	}
 
+	public float getProgress() {
+		return (float) getDownloadedBytes() / (float) getTotalBytes();
+	}
+
 	@Override
 	public String toString() {
 		return "ProgressEvent [downloadId="
@@ -92,8 +96,8 @@ public class ProgressEvent implements IEvent {
 				+ downloadedBytes
 				+ ", totalBytes="
 				+ totalBytes
-				+ ", progress="
-				+ progress
+				+ ", eta="
+				+ eta
 				+ ", speed="
 				+ speed
 				+ ", playlistIndex="
