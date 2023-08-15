@@ -1,0 +1,8 @@
+{
+	"startDownload": "Start download",
+	"urlLabel": "Video/Audio URL",
+	"audioOnlyLabel": "Audio only",
+	"totalProgress": "Downloading {{index}} / {{count}}...",
+	"downloadButton": "Download",
+	"downloadFinishedTitle": "Download finished!"
+}
