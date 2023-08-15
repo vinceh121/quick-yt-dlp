@@ -2,7 +2,7 @@ import { Loader } from "./Loader";
 import { liveDownload } from "./api";
 import i18n from "./i18n";
 import { useEffect, useState } from "react";
-import { Box, Button, Card, CardContent, CardMedia, LinearProgress, Paper, Slide, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardMedia, LinearProgress, Paper, Slide, Snackbar, Stack, Typography } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import { DownloadDone } from "@mui/icons-material";
 
@@ -54,6 +54,11 @@ export function CurrentDownload({ params: { downloadId } }) {
 	const [state, setState] = useState({});
 	const [lastEvent, setLastEvent] = useState(undefined);
 	const [downloadPath, setDownloadPath] = useState(undefined);
+	const [error, setError] = useState(undefined);
+
+	const onSnackClose = () => {
+		setError(undefined);
+	};
 
 	useEffect(() => {
 		liveDownload(downloadId).then(ws => {
@@ -68,6 +73,9 @@ export function CurrentDownload({ params: { downloadId } }) {
 					setDownloadPath(data.downloadPath);
 				}
 			};
+
+			ws.onerror = setError;
+			ws.onclose = setError;
 		});
 	}, [downloadId]);
 
@@ -95,5 +103,8 @@ export function CurrentDownload({ params: { downloadId } }) {
 
 			{Object.values(state).sort(stateSort).map(s => <DownloadEntry key={s.videoId} state={s} />)}
 		</Stack>
+		<Snackbar open={error} autoHideDuration={10000} onClose={onSnackClose}>
+			<Alert onClose={onSnackClose} severity="error">{String(error)}</Alert>
+		</Snackbar>
 	</>;
 }
