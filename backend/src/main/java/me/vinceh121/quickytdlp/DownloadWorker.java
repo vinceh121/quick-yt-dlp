@@ -160,8 +160,8 @@ public class DownloadWorker implements Handler<Promise<Void>> {
 		final String videoId = parts[0];
 		final String videoTitle = parts[1];
 		final String videoThumbnail = "NA".equals(parts[2]) ? null : parts[2];
-		final long downloadedBytes = Long.parseLong(parts[3]);
-		final long totalBytes = Long.parseLong(parts[4]);
+		final long downloadedBytes = "NA".equals(parts[3]) ? 0 : Long.parseLong(parts[3]);
+		final long totalBytes = "NA".equals(parts[4]) ? 0 : Long.parseLong(parts[4]);
 		final float eta = "NA".equals(parts[5]) ? Float.NaN : Float.parseFloat(parts[5]);
 		final float speed = "NA".equals(parts[6]) ? Float.NaN : Float.parseFloat(parts[6]);
 		final int playlistIndex = "NA".equals(parts[7]) ? -1 : Integer.parseInt(parts[7]);
