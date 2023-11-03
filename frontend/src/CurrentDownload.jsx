@@ -108,8 +108,12 @@ export function CurrentDownload(params) {
 		fetchDownloadJob(params.params.downloadId).then(res => {
 			setState(res.state);
 
+			const keys = Object.keys(res.state);
+
 			if (res.downloadPath) {
 				setDownloadPath(res.downloadPath);
+			} else if (keys.length === 1 && res.state[keys[0]].downloadPath) {
+				setDownloadPath(res.state[keys[0]].downloadPath);
 			}
 		}, setError);
 	}, [params.params.downloadId]);
@@ -122,7 +126,7 @@ export function CurrentDownload(params) {
 					: <Paper sx={{ padding: "1rem" }}>
 						{!downloadPath
 							?
-							lastEvent.playlistIndex === -1 || lastEvent.playlistCount === -1
+							!lastEvent || lastEvent.playlistIndex === -1 || lastEvent.playlistCount === -1
 								? <LinearProgress color="secondary" variant="indeterminate" />
 								: <>
 									<LinearProgress color="secondary" variant="determinate" value={lastEvent.playlistIndex / lastEvent.playlistCount * 100} />
